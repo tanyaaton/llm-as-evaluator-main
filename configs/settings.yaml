@@ -1,0 +1,38 @@
+default:
+  Title: watsonx evaluation
+
+development:
+  generation_answer:
+    llm_generate:
+      name: meta-llama/llama-3-8b-instruct
+      decoding_method: "greedy"
+      max_new_tokens: 300
+      min_new_tokens: 30
+      repetition_penalty: 1
+    embedder_model:
+      source: hugging_face
+      name: kornwtp/simcse-model-phayathaibert
+      # source: watsonxai
+      # name: ... as example
+
+  faithfulness:
+    llm_divide:
+      name: meta-llama/llama-3-8b-instruct
+      decoding_method: "greedy"
+      max_new_tokens: 300
+      min_new_tokens: 30
+      repetition_penalty: 1
+      prompt_location: some_location.txt
+
+    llm_eval:
+      name: meta-llama/llama-3-70b-instruct
+      decoding_method: "greedy"
+      max_new_tokens: 300
+      min_new_tokens: 30
+      repetition_penalty: 1
+      prompt_location: 
+
+  answer_relevency:
+    embedder_eval: 
+      source: hugging_face
+      name: kornwtp/simcse-model-phayathaibert
