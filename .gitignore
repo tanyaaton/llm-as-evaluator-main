@@ -1,2 +1,4 @@
 .env
 *.egg_info
+*.your_project_name.egg-info
+*.log

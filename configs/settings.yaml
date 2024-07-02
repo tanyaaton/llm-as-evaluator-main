@@ -2,7 +2,7 @@ default:
   Title: watsonx evaluation
 
 development:
-  generation_answer:
+  generate_answer:
     llm_generate:
       name: meta-llama/llama-3-8b-instruct
       decoding_method: "greedy"
@@ -10,22 +10,27 @@ development:
       min_new_tokens: 30
       repetition_penalty: 1
     embedder_model:
-      source: hugging_face
+      source: huggingface  # watsonxai huggingface
       name: kornwtp/simcse-model-phayathaibert
-      # source: watsonxai
-      # name: ... as example
+      chunk_size: 1200
+      overlap_size: 200
 
   faithfulness:
     llm_divide:
+      source: watsonxai
       name: meta-llama/llama-3-8b-instruct
+      prompt_language: TH
       decoding_method: "greedy"
       max_new_tokens: 300
       min_new_tokens: 30
       repetition_penalty: 1
       prompt_location: some_location.txt
+      
 
     llm_eval:
+      source: watsonxai
       name: meta-llama/llama-3-70b-instruct
+      prompt_language: EN
       decoding_method: "greedy"
       max_new_tokens: 300
       min_new_tokens: 30

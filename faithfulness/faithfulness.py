@@ -4,36 +4,45 @@ from function_faithfulness import store_divided_answer_found
 from function import connect_watsonx_llm
 import datetime
 
-model_id_llm_llama3_8b='meta-llama/llama-3-8b-instruct'
-model_id_llm_llama3_70b='meta-llama/llama-3-70b-instruct'
+# llm divide model
+d_model_id=             settings.faithfulness.llm_divide.name
+d_decoding_method=      settings.faithfulness.llm_divide.decoding_method
+d_min_new_tokens=       settings.faithfulness.llm_divide.min_new_tokens
+d_max_new_tokens=       settings.faithfulness.llm_divide.max_new_tokens
+d_repetition_penalty=   settings.faithfulness.llm_divide.repetition_penalty
+d_mode=                 settings.faithfulness.llm_divide.prompt_language
+d_model_source=         settings.faithfulness.llm_divide.source
+if d_model_source == 'watsonxai':
+    divide_model  = connect_watsonx_llm(d_model_id, 
+                                 d_decoding_method, d_min_new_tokens, d_max_new_tokens, d_repetition_penalty)
+elif d_model_source == 'openai':    pass
+else:   raise ValueError(f"Invalid input: '{d_model_source}' model is not supported. Pleasechoose model from 'watsonxai' or 'openai' sources")
 
-model_llm_llama3_8b  = connect_watsonx_llm(model_id_llm_llama3_8b)
-model_llm_llama3_70b = connect_watsonx_llm(model_id_llm_llama3_70b)
+# llm evaluation model
+e_model_id=             settings.faithfulness.llm_eval.name
+e_decoding_method=      settings.faithfulness.llm_eval.decoding_method
+e_min_new_tokens=       settings.faithfulness.llm_eval.min_new_tokens
+e_max_new_tokens=       settings.faithfulness.llm_eval.max_new_tokens
+e_repetition_penalty=   settings.faithfulness.llm_eval.repetition_penalty
+e_mode=                 settings.faithfulness.llm_eval.prompt_language
+e_model_source=         settings.faithfulness.llm_eval.source
+if e_model_source == 'watsonxai':
+    eval_model  = connect_watsonx_llm(e_model_id, 
+                                 e_decoding_method, e_min_new_tokens, e_max_new_tokens, e_repetition_penalty)
+elif d_model_source == 'openai':    pass
+else:   raise ValueError(f"Invalid input: '{e_model_source}' model is not supported. Pleasechoose model from 'watsonx' or 'openai' sources")
 
-# choose model and mode
-ans = '70b'         #'8b' '70b' 'gpt'
-d_model = '8b'      #'8b' '70b' 'gpt'
-d_mode = 'TH'       #'TH 'EN'
-e_model = '70b'     #'8b' '70b' 'gpt'
-e_mode = 'EN'       #'TH 'EN'
 
-if d_model == '8b':     divide_model = model_llm_llama3_8b
-elif d_model == '70b':  divide_model = model_llm_llama3_70b
-elif d_mode == 'gpt':   divide_model = 'gpt'
-else:                   raise ValueError(f"Invalid input: '{d_mode}' is not allowed.")
-
-if e_model == '8b':     eval_model = model_llm_llama3_8b
-elif e_model == '70b':  eval_model = model_llm_llama3_70b
-elif e_model == 'gpt':  eval_model = 'gpt'
-else:                   raise ValueError(f"Invalid input: '{e_mode}' is not allowed.")
-
-data_df = pd.read_csv(f'csv_faithfulness_TH_{ans}/lm3_{ans}_answer.csv')
+data_df = pd.read_csv(f'csv_files/content.csv')
 content_df = data_df.loc[:,["question","answer","contexts"]]
 
 now = datetime.datetime.now()
 formatted_datetime = now.strftime("%d-%m-%Y_%H%M")
 
 new_df = store_divided_answer_found(content_df, divide_model=divide_model, d_mode=d_mode, eval_model=eval_model, e_mode=e_mode)
+new_ff_df = new_df.loc[:,["question","answer","contexts","faithfuln"]]
 
-new_df.to_csv(        f'csv_faithfulness_TH_{ans}/test_D8b{d_mode}_E70b{e_mode}_{formatted_datetime}.csv')
-new_df.to_excel(f'csv_faithfulness_TH_{ans}/excel/test_D8b{d_mode}_E70b{e_mode}_{formatted_datetime}.xlsx')
+new_df.to_csv(        f'csv_files/eval_faithfulness_detail_{formatted_datetime}.csv')
+new_df.to_excel(f'csv_files/excel/eval_faithfulness_detail_{formatted_datetime}.xlsx')
+new_ff_df.to_csv(        f'csv_files/eval_faithfulness_{formatted_datetime}.csv')
+new_ff_df.to_excel(f'csv_files/excel/eval_faithfulness_{formatted_datetime}.xlsx')

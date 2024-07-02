@@ -50,14 +50,14 @@ def connect_sentencetransformer_embedding(model_id_embedding):
     sentencetransformer_embedding = SentenceTransformer(f'{model_id_embedding}')
     return sentencetransformer_embedding
 
-def connect_watsonx_llm(model_id_llm):
+def connect_watsonx_llm(model_id_llm, decoding_method, min_new_tokens, max_new_tokens, repetition_penalty):
     print('connecting to watsonxllm...')
     params = {
-        'decoding_method': "greedy",
-        'min_new_tokens': 30,
-        'max_new_tokens': 300,
+        'decoding_method': decoding_method,
+        'min_new_tokens': min_new_tokens,
+        'max_new_tokens': max_new_tokens,
         'temperature': 0.0,
-        'repetition_penalty': 1
+        'repetition_penalty': repetition_penalty
     }
     model_llm = Model(model_id= model_id_llm,
                     params=params, credentials=creds,
@@ -94,8 +94,8 @@ def split_text_with_overlap(text, chunk_size, overlap_size):
 
     return chunks
 
-def embedding_data(text, model_embedding):
-    chunks = split_text_with_overlap(text, 1200, 300)
+def embedding_data(text, model_embedding, chunk_size, overlap_size):
+    chunks = split_text_with_overlap(text, chunk_size, overlap_size)
     collection_leavepdf = create_milvus_db('leavepdf_TH')
     if str(type(model_embedding)) == "<class 'sentence_transformers.SentenceTransformer.SentenceTransformer'>":
         vector  = model_embedding.encode(chunks)
@@ -168,7 +168,7 @@ def generate_prompt_th(question, context):
 def find_response(model_llm, content_df):
     for i in content_df.index:
         prompt = generate_prompt_th(content_df["question"][i], content_df["contexts"][i])
-        logging.info(prompt)
         # prompt = generate_prompt_en(content_df["question"][i], content_df["contexts"][i])
+        logging.info(prompt)
         answer = model_llm.generate_text(prompt)
         content_df.loc[i,"answer"]= answer
