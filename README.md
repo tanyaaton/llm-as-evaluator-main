@@ -1,6 +1,9 @@
 # 📊 LLM as evaluator
 
 This lab impliment watsonx llm model to use as evaluator for RAG application
+Before getting start don't forget to install all the requirement package 
+`pip install -r requirements.txt`
+and add `.env` file with credential for ibm watsonx
 
 ## Faithfulness
 
