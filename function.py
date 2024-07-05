@@ -94,8 +94,7 @@ def split_text_with_overlap(text, chunk_size, overlap_size):
 
     return chunks
 
-def embedding_data(text, model_embedding, chunk_size, overlap_size):
-    chunks = split_text_with_overlap(text, chunk_size, overlap_size)
+def embedding_data(chunks, model_embedding):
     collection_leavepdf = create_milvus_db('leavepdf_TH')
     if str(type(model_embedding)) == "<class 'sentence_transformers.SentenceTransformer.SentenceTransformer'>":
         vector  = model_embedding.encode(chunks)

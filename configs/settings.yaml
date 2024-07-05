@@ -37,7 +37,16 @@ development:
       repetition_penalty: 1
       prompt_location: 
 
-  answer_relevency:
-    embedder_eval: 
-      source: hugging_face
-      name: kornwtp/simcse-model-phayathaibert
+  answer_relevancy:
+    embedder_model: 
+      source: watsonxai
+      name: ibm/slate-125m-english-rtrvr
+      # source: huggingface
+      # name: kornwtp/simcse-model-phayathaibert
+    llm_predict:
+      source: watsonxai
+      name: meta-llama/llama-3-70b-instruct
+      decoding_method: "greedy"
+      max_new_tokens: 300
+      min_new_tokens: 30
+      repetition_penalty: 1

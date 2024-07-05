@@ -1,6 +1,6 @@
 import os
 from function import ( connect_watsonx_embedding, connect_sentencetransformer_embedding,connect_watsonx_llm, connect_to_milvus, 
-                      embedding_data ,find_answer_doc_from_q_df, generate_doc, find_response, drop_milvus_collection)
+                      embedding_data ,find_answer_doc_from_q_df, generate_doc, find_response, drop_milvus_collection, split_text_with_overlap)
 import pandas as pd
 from utils.config import settings
 
@@ -34,7 +34,8 @@ question_df = pd.read_csv('csv_files/question.csv')
 
 # embed data
 thai_text = open("text/leave_policy_TH.txt", encoding="utf8").read()
-collection = embedding_data(thai_text, model_embedder, chunk_size, overlap_size)
+chunks = split_text_with_overlap(thai_text, chunk_size, overlap_size)
+collection = embedding_data(chunks, model_embedder)
 
 # get hits and save doc file 
 hits = find_answer_doc_from_q_df(question_df, collection, model_embedder)
@@ -44,7 +45,6 @@ content_df = question_df.loc[:,['question','contexts']]
 find_response(model_llm, content_df)
 
 print('exporting csv file...')
-question_df.to_csv('csv_files/content.csv')
 content_df.to_csv('csv_files/content.csv')
 
 drop_milvus_collection()
