@@ -3,10 +3,14 @@ default:
 
 development:
   generate_answer:
+    question_csv_location: csv_hr_files_mixtral_large/ # change
+    question_csv_name: question-hr-TH-temp.csv # change
     llm_generate:
-      name: meta-llama/llama-3-8b-instruct
+      # name: meta-llama/llama-3-70b-instruct
+      # name: mistralai/mixtral-8x7b-instruct-v01
+      name: mistralai/mistral-large # change
       decoding_method: "greedy"
-      max_new_tokens: 300
+      max_new_tokens: 500
       min_new_tokens: 30
       repetition_penalty: 1
     embedder_model:
@@ -16,6 +20,8 @@ development:
       overlap_size: 200
 
   faithfulness:
+    content_csv_location: csv_hr_files_llama3_8b/ # change
+    content_csv_name: content.csv
     llm_divide:
       source: watsonxai
       name: meta-llama/llama-3-8b-instruct
@@ -25,28 +31,49 @@ development:
       min_new_tokens: 30
       repetition_penalty: 1
       prompt_location: some_location.txt
-      
-
     llm_eval:
-      source: watsonxai
-      name: meta-llama/llama-3-70b-instruct
-      prompt_language: EN
-      decoding_method: "greedy"
+      source: watsonxai 
+      name: meta-llama/llama-3-70b-instruct 
+      prompt_language: EN 
+      decoding_method: "greedy" 
       max_new_tokens: 300
       min_new_tokens: 30
       repetition_penalty: 1
       prompt_location: 
 
   answer_relevancy:
+    content_csv_location: csv_hr_files_8b/ # change
+    content_csv_name: content.csv
     embedder_model: 
       source: watsonxai
       name: ibm/slate-125m-english-rtrvr
       # source: huggingface
       # name: kornwtp/simcse-model-phayathaibert
     llm_predict:
-      source: watsonxai
-      name: meta-llama/llama-3-70b-instruct
+      source: watsonxai 
+      name: meta-llama/llama-3-70b-instruct 
       decoding_method: "greedy"
       max_new_tokens: 300
       min_new_tokens: 30
       repetition_penalty: 1
+
+  customized_matrics:
+    content_csv_location: csv_hr_files_70b/ # change
+    content_csv_name: content.csv
+    llm_eval:
+      source: watsonxai 
+      name: meta-llama/llama-3-70b-instruct 
+      prompt_language: EN 
+      decoding_method: "greedy" 
+      max_new_tokens: 300
+      min_new_tokens: 30
+      repetition_penalty: 1
+      prompt_location: 
+  
+  compare:
+    file_name_list:
+      - csv_hr_files_8b/eval_faithfulness_18-07-2024_1437
+      - csv_hr_files_70b/eval_faithfulness_18-07-2024_1648
+      - csv_hr_files_mixtral/eval_faithfulness_ #......
+      - csv_hr_files #.....
+    

@@ -1,4 +1,4 @@
-from __answer_relevancy.prompt_answer_relevancy import predict_question_instruction_TH, predict_question_instruction_EN
+from __answer_relevancy.prompt import predict_question_instruction_TH, predict_question_instruction_EN
 import numpy as np
 
 def predict_question_from_answer_llm3_TH(answer, model_llm_llama3, mode):

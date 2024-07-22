@@ -1,7 +1,8 @@
 import pandas as pd
 from utils.config import settings
 from function_faithfulness import store_divided_answer_found
-from function import connect_watsonx_llm
+from connection import connect_watsonx_llm
+import numpy as np
 import datetime
 
 # llm divide model
@@ -29,11 +30,15 @@ e_model_source=         settings.faithfulness.llm_eval.source
 if e_model_source == 'watsonxai':
     eval_model  = connect_watsonx_llm(e_model_id, 
                                  e_decoding_method, e_min_new_tokens, e_max_new_tokens, e_repetition_penalty)
-elif d_model_source == 'openai':    pass
+elif e_model_source == 'openai':    pass
 else:   raise ValueError(f"Invalid input: '{e_model_source}' model is not supported. Pleasechoose model from 'watsonx' or 'openai' sources")
 
 
-data_df = pd.read_csv(f'csv_files/content.csv')
+file_location = settings.faithfulness.content_csv_location
+file_name = settings.faithfulness.content_csv_name
+print(f'evaluating {file_location}{file_name} with {e_model_id}')
+
+data_df = pd.read_csv(f'{file_location}{file_name}')
 content_df = data_df.loc[:,["question","answer","contexts"]]
 
 now = datetime.datetime.now()
@@ -42,7 +47,9 @@ formatted_datetime = now.strftime("%d-%m-%Y_%H%M")
 new_df = store_divided_answer_found(content_df, divide_model=divide_model, d_mode=d_mode, eval_model=eval_model, e_mode=e_mode)
 new_ff_df = new_df.loc[:,["question","answer","contexts","faithfuln"]]
 
-new_df.to_csv(        f'csv_files/eval_faithfulness_detail_{formatted_datetime}.csv')
-new_df.to_excel(f'csv_files/excel/eval_faithfulness_detail_{formatted_datetime}.xlsx')
-new_ff_df.to_csv(        f'csv_files/eval_faithfulness_{formatted_datetime}.csv')
-new_ff_df.to_excel(f'csv_files/excel/eval_faithfulness_{formatted_datetime}.xlsx')
+# print('faithfulness = ', round(new_ff_df.groupby('faithfuln').mean(),5))
+
+new_df.to_csv(f'{file_location}eval_faithfulness_detail_{formatted_datetime}.csv')
+new_df.to_excel(f'{file_location}excel/eval_faithfulness_detail_{formatted_datetime}.xlsx')
+new_ff_df.to_csv(f'{file_location}eval_faithfulness_{formatted_datetime}.csv')
+new_ff_df.to_excel(f'{file_location}excel/eval_faithfulness_{formatted_datetime}.xlsx')

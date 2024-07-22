@@ -2,8 +2,7 @@ import pandas as pd
 import numpy as np
 from utils.config import settings
 from __answer_relevancy.function_answer_relevancy import predict_question_from_answer_llm3_TH, npsumdot
-from function import ( connect_watsonx_embedding, connect_sentencetransformer_embedding,connect_watsonx_llm, connect_to_milvus, 
-                      embedding_data ,find_answer_doc_from_q_df, generate_doc, find_response, drop_milvus_collection, split_text_with_overlap)
+from connection import ( connect_watsonx_embedding, connect_sentencetransformer_embedding, connect_watsonx_llm)
 import datetime
 
 # IBM embedding (en)
@@ -32,8 +31,11 @@ if p_model_source == 'watsonxai':
 else:   raise ValueError(f"Invalid input: '{p_model_source}' model is not supported. Please choose model from 'watsonxai' sources")
 
 
+file_location = settings.answer_relevancy.content_csv_location
+file_name = settings.answer_relevancy.content_csv_name
+print(f'evaluating {file_location}{file_name} with {p_model_id}')
 
-content_df = content_df = pd.read_csv('csv_files/content.csv')
+content_df = pd.read_csv(f'{file_location}{file_name}')
 new_df = content_df.loc[:,["question","answer","contexts"]]
 
 for i in content_df.index:
@@ -64,7 +66,7 @@ print('answer_relevancy = ', round(np.average(answer_relevancy_array),5))
 now = datetime.datetime.now()
 formatted_datetime = now.strftime("%d-%m-%Y_%H%M")
 
-new_df.to_csv(f'csv_files/evaluation_ansrelevancy_{formatted_datetime}.csv')
-new_df.to_excel(f'csv_files/excel/evaluation_ansrelevancy_{formatted_datetime}.xlsx')
-content_df.to_csv(f'csv_files/evaluation_ansrelevancy_detial_{formatted_datetime}.csv')
-content_df.to_excel(f'csv_files/excel/evaluation_ansrelevancy_detial_{formatted_datetime}.xlsx')
+new_df.to_csv(f'{file_location}eval_ansrelevancy_{formatted_datetime}.csv')
+new_df.to_excel(f'{file_location}excel/eval_ansrelevancy_{formatted_datetime}.xlsx')
+content_df.to_csv(f'{file_location}eval_ansrelevancy_detial_{formatted_datetime}.csv')
+content_df.to_excel(f'{file_location}excel/eval_ansrelevancy_detial_{formatted_datetime}.xlsx')
